@@ -3,7 +3,7 @@
 		<Navbar />
 		<div class="container">
 			<!-- Start Breaccrumb -->
-			<div class="row mt-5">
+			<div class="row mt-4">
 				<div class="col">
 					<nav aria-label="breadcrumb ">
 						<ol class="breadcrumb">
@@ -17,7 +17,7 @@
 			<!-- End Breaccrumb -->
 
 			<!-- Start Food Detail -->
-			<div class="row mt-3">
+			<div class="row mt-3" v-on:submit.prevent>
 				<div class="col-md-6">
 					<img :src="'../assets/images/' + product.gambar" class="img-fluid shadow" />
 				</div>
@@ -32,13 +32,13 @@
 					<form action="" class="mt-4">
 						<div class="form-group">
 							<label for="jumlah_pemesanan">Jumlah Pesan</label>
-							<input type="number" class="form-control" />
+							<input type="number" class="form-control" v-model="pesan.jumlah_pemesanan" />
 						</div>
 						<div class="form-group">
 							<label for="keterangan">Keterangan</label>
-							<textarea name="" id="" cols="30" rows="2" class="form-control" placeholder="Keterangan spt : pedas"></textarea>
+							<textarea name="" id="" cols="30" rows="2" class="form-control" placeholder="Keterangan spt : pedas" v-model="pesan.keterangan"></textarea>
 						</div>
-						<button type="submit" class="btn btn-success"><b-icon-cart></b-icon-cart> Pesan</button>
+						<button type="submit" class="btn btn-success" @click="pemesanan"><b-icon-cart></b-icon-cart> Pesan</button>
 					</form>
 				</div>
 			</div>
@@ -58,12 +58,37 @@ export default {
 	},
 	data() {
 		return {
-			product: [],
+			product: {},
+			pesan: {},
 		};
 	},
 	methods: {
 		setProduct(data) {
 			this.product = data;
+		},
+		pemesanan() {
+			if (this.pesan.jumlah_pemesanan) {
+				this.pesan.products = this.product;
+				axios
+					.post("http://localhost:3000/keranjangs", this.pesan)
+					.then(() => {
+						this.$router.push({ path: "/keranjang" });
+						this.$toast.success("Pesanan Berhasil", {
+							type: "success",
+							position: "top-right",
+							duration: "3000",
+							dismissible: true,
+						});
+					})
+					.catch((error) => console.log("error : ", error));
+			} else {
+				this.$toast.error("Jumlah Pesanan Harus Diisi", {
+					type: "error",
+					position: "top-right",
+					duration: "3000",
+					dismissible: true,
+				});
+			}
 		},
 	},
 	mounted() {
